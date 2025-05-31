@@ -1,135 +1,80 @@
-# 🎬 Netflix & The World: How Politics, Awards, and Genre Shape Global Viewing Habits
+# 🎬 Netflix & The World: How We Cope Through Stories in Times of Global Crisis
 
 ## 📌 Overview
 
-This project explores what Netflix's catalog reveals about global content trends — and how our viewing patterns reflect or reject the political realities of the time.
+In moments of political unrest, global pandemics, or national trauma, we often turn to stories — not just to be entertained, but to cope, reflect, or escape. This project explores **how streaming content mirrors our social reality** — and at times, offers us a temporary sanctuary from it.
 
-## 🔍 Key Research Questions
+Using Netflix's global catalog, enriched with genre, award, and political context data, this project examines:
 
-1. **Political Impact**: How do major national events influence content creation and consumption?
-2. **Cultural Coping**: During national trauma or political turmoil, what stories do people gravitate toward?
-3. **Award Patterns**: Do politically charged times produce more critically acclaimed content?
-4. **Genre Shifts**: Do we see more escapism during crisis, or do we confront reality through our media choices?
+* What kind of content performs best across different countries and time periods?
+* How do national events like protests, uprisings, elections, or war shape the stories that are told — or streamed?
+* What genres become our collective therapy during global or national crisis?
 
-## 🛠 Setup & Installation
+## 🌐 Live Demo
+Visit the live demo at [Netflix Analysis Dashboard](#) (Coming Soon)
 
-1. Install required packages:
-```bash
-python -m pip install -r requirements.txt
-```
+## 📱 Mobile App
+Download the PWA version by visiting the website on your mobile device and adding it to your home screen.
 
-2. Ensure you have the Netflix titles database (`netflix_titles.db`) in the project directory.
+## 🔍 Key Features
 
-3. Set up the database structure:
-```bash
-python setup_database.py
-```
+* Interactive dashboards showing global content trends
+* COVID-19 impact analysis (2020-2022)
+* Political context correlation with content preferences
+* Country-specific analysis and comparisons
+* Mobile-responsive design with PWA support
+* Netflix-inspired UI/UX
 
-## 📊 Running the Analysis
+## 🛠️ Technical Stack
 
-1. First, enrich the database with political context and awards data:
-```bash
-python enrich_netflix_data.py
-```
+* **Frontend**: HTML5, CSS3, JavaScript
+* **Visualization**: Plotly.js
+* **Backend**: Python/Flask
+* **Data Processing**: Pandas, NumPy
+* **Database**: SQLite
+* **APIs**: OMDb, TMDb
+* **PWA Features**: Service Workers, Web App Manifest
 
-2. Generate the initial visualizations:
-```bash
-python country_dashboards.py
-```
+## 📊 Key Visualizations & Dashboards
 
-3. Start the web interface:
-```bash
-python app.py
-```
+| Visualization | Purpose |
+|--------------|---------|
+| **Genre vs Awards Heatmap** | See what genres win awards globally |
+| **Country vs Awards Map** | Track critical acclaim by region |
+| **Conflict vs Content Volume** | Are people producing more — or consuming differently — in crisis? |
+| **Escapism Index by Year** | What was the "most escapist" year in each country? |
+| **Word Clouds** | Common themes and tropes during high-conflict years |
 
-Visit `http://localhost:5000` in your browser to access the interactive dashboard.
-
-## 📈 Dashboard Features
-
-### 1. Country-Specific Analysis
-- Content evolution timeline
-- Genre distribution
-- Escapism vs. Reality preference indicator
-- Awards distribution
-- Political context correlation
-
-### 2. COVID-19 Impact (2020-2022)
-- Content volume changes
-- Genre preference shifts
-- Country-specific coping mechanisms
-- Award-winning content distribution
-
-### 3. Political Context Matrix
-The political context analysis maps content against real-world events using:
-- Political Intensity Score: Calculated from major events database
-- Genre Evolution: Tracks genre changes during political events
-- Award Correlation: Maps critical acclaim against political backdrop
-- Content Response Time: How quickly content adapts to events
-
-### 4. Global Comparisons
-- Interactive heatmap of content preferences
-- Most escapist vs. most reality-focused countries
-- Regional content strategy comparisons
-- Crisis response patterns
-
-## 🎯 Political Analysis Methodology
-
-The project tracks political context through multiple layers:
-
-1. **Event Database**
-   - Major political events by country
-   - Event intensity scoring
-   - Duration of impact
-   - Global ripple effects
-
-2. **Content Response Tracking**
-   - Genre shifts following events
-   - Production volume changes
-   - Theme evolution
-   - Award patterns during turbulent times
-
-3. **Cultural Coping Indicators**
-   - Escapism score calculation
-   - Reality-engagement metrics
-   - Genre preference shifts
-   - Content consumption patterns
-
-## 📊 Visualization Structure
-
-The dashboard is built with:
-- Flask backend serving data
-- Interactive Plotly.js visualizations
-- Dynamic content loading
-- Netflix-inspired UI design
-
-## 🔄 Project Structure
+## 📁 Project Structure
 
 ```
 netflix-analysis/
-├── app.py                 # Flask web application
-├── country_dashboards.py  # Dashboard generation script
-├── enrich_netflix_data.py # Data enrichment script
-├── setup_database.py      # Database setup script
-├── static/               
-│   └── css/              # Stylesheets
-│       └── style.css     
-├── templates/            
-│   └── index.html        # Main dashboard template
-└── dashboards/           # Generated visualization files
+├── app/
+│   ├── static/
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── icons/
+│   └── templates/
+├── data/
+│   ├── raw/
+│   └── processed/
+├── notebooks/
+├── utils/
+└── README.md
 ```
 
-## 📝 Research Notes
+## 🌍 Country Focus (2016–2024)
 
-- Political context scores factor in event intensity and frequency
-- Award metrics include both nominations and wins
-- Genre analysis considers both primary and secondary categorizations
-- All visualizations are interactive for deeper exploration
+Special attention is given to how countries responded to:
+* COVID-19 (2020–2022)
+* The George Floyd protests (global echoes in 2020)
+* National reckonings with race, colonial legacy, and power dynamics
 
-## 🎯 Key Findings Focus
+## 📬 Contact & Contributions
 
-- How content strategies shift during political upheaval
-- Regional differences in cultural coping through media
-- The relationship between political tension and content quality
-- Global patterns in escapist vs. confrontational content choices
+Have ideas or want to collaborate?
+Reach out via [GitHub Issues](https://github.com/AC-repo) or email me at `[contact info]`.
 
-This research provides unique insights into how global societies process and respond to political events through their media consumption patterns, offering a window into cultural coping mechanisms across different societies and time periods. 
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
