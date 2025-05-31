@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e50914">
+    <meta name="description" content="Analyze global Netflix content trends and political influences">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Netflix Analysis">
+    
+    <title>Netflix Content Analysis</title>
+    
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="/static/js/main.js" defer></script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <nav class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <h1>Netflix Analysis</h1>
+        </div>
+        <div class="sidebar-content">
+            <h2 class="sr-only">Navigation Menu</h2>
+            <h3>Countries</h3>
+            <ul id="countryList" role="list" aria-label="Country list"></ul>
+            
+            <h3>Global Views</h3>
+            <ul role="list" aria-label="Global views">
+                <li><a href="#" data-view="global-heatmap" role="button" aria-label="View global heatmap">Global Heatmap</a></li>
+                <li><a href="#" data-view="preference-comparison" role="button" aria-label="View preference comparison">Preference Comparison</a></li>
+                <li><a href="#" data-view="covid-analysis" role="button" aria-label="View COVID-19 impact">COVID-19 Impact</a></li>
+                <li><a href="#" data-view="political-matrix" role="button" aria-label="View political context">Political Context</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="content" id="main-content" role="main">
+        <h2 class="sr-only">Key Metrics and Visualizations</h2>
+        <div class="key-metrics" role="region" aria-label="Key metrics">
+            <div class="metric-card" id="most-escapist" role="article" aria-labelledby="escapist-title">
+                <h3 id="escapist-title">Most Escapist Country</h3>
+                <div class="loading" role="status" aria-label="Loading data"></div>
+            </div>
+            <div class="metric-card" id="most-reality" role="article" aria-labelledby="reality-title">
+                <h3 id="reality-title">Most Reality-Based Country</h3>
+                <div class="loading" role="status" aria-label="Loading data"></div>
+            </div>
+            <div class="metric-card" id="covid-impact" role="article" aria-labelledby="covid-title">
+                <h3 id="covid-title">COVID-19 Impact Score</h3>
+                <div class="loading" role="status" aria-label="Loading data"></div>
+            </div>
+        </div>
+
+        <div id="visualization-container" role="region" aria-label="Data visualizations">
+            <div class="loading" role="status" aria-label="Loading visualization"></div>
+        </div>
+    </main>
+
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 
