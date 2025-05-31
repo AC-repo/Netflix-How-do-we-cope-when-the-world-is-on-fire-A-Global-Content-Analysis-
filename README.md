@@ -11,7 +11,7 @@ Using Netflix's global catalog, enriched with genre, award, and political contex
 * What genres become our collective therapy during global or national crisis?
 
 ## 🌐 Live Demo
-Visit the live demo at [Netflix Analysis Dashboard](#) (Coming Soon)
+Visit the live demo at [Netflix Analysis Dashboard](https://ac-repo.github.io/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/)
 
 ## 📱 Mobile App
 Download the PWA version by visiting the website on your mobile device and adding it to your home screen.
