@@ -11,10 +11,16 @@
     
     <title>Netflix Content Analysis</title>
     
+    <base href="/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Load Plotly.js first -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Load our mock data -->
+    <script src="data/mock_data.js"></script>
+    <!-- Load our main application code -->
     <script src="js/main.js" defer></script>
 </head>
 <body>
@@ -26,16 +32,20 @@
         </div>
         <div class="sidebar-content">
             <h2 class="sr-only">Navigation Menu</h2>
-            <h3>Countries</h3>
-            <ul id="countryList" role="list" aria-label="Country list"></ul>
+            <div class="nav-section">
+                <h3>Countries</h3>
+                <ul id="countryList" role="list" aria-label="Country list"></ul>
+            </div>
             
-            <h3>Global Views</h3>
-            <ul role="list" aria-label="Global views">
-                <li><a href="#" data-view="global-heatmap" role="button" aria-label="View global heatmap">Global Heatmap</a></li>
-                <li><a href="#" data-view="preference-comparison" role="button" aria-label="View preference comparison">Preference Comparison</a></li>
-                <li><a href="#" data-view="covid-analysis" role="button" aria-label="View COVID-19 impact">COVID-19 Impact</a></li>
-                <li><a href="#" data-view="political-matrix" role="button" aria-label="View political context">Political Context</a></li>
-            </ul>
+            <div class="nav-section">
+                <h3>Global Views</h3>
+                <ul role="list" aria-label="Global views">
+                    <li><a href="#" data-view="global-heatmap" role="button" aria-label="View global heatmap">Global Heatmap</a></li>
+                    <li><a href="#" data-view="preference-comparison" role="button" aria-label="View preference comparison">Preference Comparison</a></li>
+                    <li><a href="#" data-view="covid-analysis" role="button" aria-label="View COVID-19 impact">COVID-19 Impact</a></li>
+                    <li><a href="#" data-view="political-matrix" role="button" aria-label="View political context">Political Context</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 

@@ -1,376 +1,189 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the dashboard
-    loadCountryList();
-    loadGlobalMetrics();
+// Constants
+const BASE_PATH = '/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/';
 
-    // Set up event listeners
-    setupNavigationHandlers();
+// Mock data for initial load
+const mockData = {
+    countries: [
+        { name: 'United States', escapism_score: 0.85, reality_score: 0.45 },
+        { name: 'United Kingdom', escapism_score: 0.75, reality_score: 0.55 },
+        { name: 'Japan', escapism_score: 0.90, reality_score: 0.35 },
+        // Add more countries as needed
+    ],
+    covid_impact: {
+        global_score: 0.72,
+        trend: 'increasing',
+        top_genres: ['Documentary', 'Drama', 'Comedy']
+    }
+};
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    initializeNavigation();
+    loadInitialData();
 });
 
-function loadCountryList() {
-    fetch('/api/countries')
-        .then(response => response.json())
-        .then(countries => {
-            const countryList = document.getElementById('countryList');
-            countries.forEach(country => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.href = '#';
-                a.textContent = country;
-                a.setAttribute('data-country', country);
-                a.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadCountryDashboard(country);
-                });
-                li.appendChild(a);
-                countryList.appendChild(li);
-            });
-        });
-}
-
-function loadGlobalMetrics() {
-    fetch('/api/global-preferences')
-        .then(response => response.json())
-        .then(data => {
-            // Sort by escapism and reality scores
-            const sortedByEscapism = [...data].sort((a, b) => b.escapism_score - a.escapism_score);
-            const sortedByReality = [...data].sort((a, b) => b.reality_score - a.reality_score);
-
-            // Update metrics cards
-            document.getElementById('most-escapist').innerHTML = `
-                <div class="metric-value">${sortedByEscapism[0].country}</div>
-                <div class="metric-detail">Score: ${sortedByEscapism[0].escapism_score.toFixed(2)}</div>
-            `;
-
-            document.getElementById('most-reality').innerHTML = `
-                <div class="metric-value">${sortedByReality[0].country}</div>
-                <div class="metric-detail">Score: ${sortedByReality[0].reality_score.toFixed(2)}</div>
-            `;
-
-            // Calculate COVID impact
-            const covidImpact = calculateCovidImpact(data);
-            document.getElementById('covid-impact').innerHTML = `
-                <div class="metric-value">${covidImpact.toFixed(2)}</div>
-                <div class="metric-detail">Global Change in Content</div>
-            `;
-        });
-}
-
-function calculateCovidImpact(data) {
-    // Calculate average change in content production during COVID years
-    return data.reduce((acc, curr) => acc + curr.covid_impact_score, 0) / data.length;
-}
-
-function setupNavigationHandlers() {
-    document.querySelectorAll('[data-view]').forEach(link => {
+// Navigation handling
+function initializeNavigation() {
+    const links = document.querySelectorAll('.sidebar a');
+    links.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const view = e.target.getAttribute('data-view');
+            const view = e.target.dataset.view;
+            updateActiveLink(e.target);
             loadView(view);
         });
     });
 }
 
-function loadView(view) {
-    const container = document.getElementById('visualization-container');
-    container.innerHTML = '<div class="loading"></div>';
+function updateActiveLink(activeLink) {
+    document.querySelectorAll('.sidebar a').forEach(link => {
+        link.classList.remove('active');
+    });
+    activeLink.classList.add('active');
+}
 
-    switch(view) {
-        case 'global-heatmap':
-            loadGlobalHeatmap();
-            break;
-        case 'preference-comparison':
-            loadPreferenceComparison();
-            break;
-        case 'covid-analysis':
-            loadCovidAnalysis();
-            break;
-        case 'political-matrix':
-            loadPoliticalMatrix();
-            break;
+// Data loading and visualization
+async function loadInitialData() {
+    try {
+        updateMetricCards(mockData);
+        populateCountryList(mockData.countries);
+        // Load default view
+        loadView('global-heatmap');
+    } catch (error) {
+        showError('Error loading initial data', error.message);
     }
 }
 
-function loadCountryDashboard(country) {
-    const container = document.getElementById('visualization-container');
-    container.innerHTML = '<div class="loading"></div>';
+function updateMetricCards(data) {
+    // Most Escapist Country
+    const escapistCard = document.getElementById('most-escapist');
+    const escapistCountry = data.countries.reduce((prev, curr) => 
+        prev.escapism_score > curr.escapism_score ? prev : curr
+    );
+    escapistCard.innerHTML = `
+        <h3>Most Escapist Country</h3>
+        <div class="metric-value">${escapistCountry.name}</div>
+        <div class="metric-detail">Score: ${(escapistCountry.escapism_score * 100).toFixed(1)}%</div>
+    `;
 
-    fetch(`/api/country/${country}`)
-        .then(response => response.json())
-        .then(data => {
-            createCountryDashboard(data, container);
+    // Most Reality-Based Country
+    const realityCard = document.getElementById('most-reality');
+    const realityCountry = data.countries.reduce((prev, curr) => 
+        prev.reality_score > curr.reality_score ? prev : curr
+    );
+    realityCard.innerHTML = `
+        <h3>Most Reality-Based Country</h3>
+        <div class="metric-value">${realityCountry.name}</div>
+        <div class="metric-detail">Score: ${(realityCountry.reality_score * 100).toFixed(1)}%</div>
+    `;
+
+    // COVID-19 Impact
+    const covidCard = document.getElementById('covid-impact');
+    covidCard.innerHTML = `
+        <h3>COVID-19 Impact Score</h3>
+        <div class="metric-value">${(data.covid_impact.global_score * 100).toFixed(1)}%</div>
+        <div class="metric-detail">Trend: ${data.covid_impact.trend}</div>
+    `;
+}
+
+function populateCountryList(countries) {
+    const countryList = document.getElementById('countryList');
+    countryList.innerHTML = countries.map(country => `
+        <li>
+            <a href="#" data-country="${country.name}">${country.name}</a>
+        </li>
+    `).join('');
+
+    // Add click handlers for country selection
+    countryList.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const country = e.target.dataset.country;
+            loadCountryData(country);
         });
-}
-
-function createCountryDashboard(data, container) {
-    // Clear loading indicator
-    container.innerHTML = '';
-
-    // Create dashboard sections
-    const sections = [
-        createContentTrendPlot(data),
-        createGenreDistributionPlot(data),
-        createEscapismTrendPlot(data),
-        createAwardsPlot(data)
-    ];
-
-    // Add preference indicator
-    const preferenceIndicator = document.createElement('div');
-    preferenceIndicator.className = 'preference-indicator';
-    preferenceIndicator.innerHTML = `
-        <h2>${data.preferences.preference}</h2>
-        <div class="score-comparison">
-            <div class="score">
-                <span>Escapism: ${data.preferences.escapism_score.toFixed(2)}</span>
-            </div>
-            <div class="score">
-                <span>Reality: ${data.preferences.reality_score.toFixed(2)}</span>
-            </div>
-        </div>
-    `;
-    container.appendChild(preferenceIndicator);
-
-    // Add visualization sections
-    sections.forEach(section => container.appendChild(section));
-}
-
-// Plotting functions using Plotly.js
-function createContentTrendPlot(data) {
-    const yearlyData = processYearlyData(data.yearly_data);
-    const div = document.createElement('div');
-    div.className = 'plot-container';
-    
-    Plotly.newPlot(div, [{
-        x: yearlyData.years,
-        y: yearlyData.counts,
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Content Volume'
-    }], {
-        title: 'Content Production Trend',
-        template: 'plotly_dark'
     });
-
-    return div;
 }
 
-function createGenreDistributionPlot(data) {
-    const div = document.createElement('div');
-    div.className = 'plot-container';
-    
-    Plotly.newPlot(div, [{
-        values: data.genre_distribution.values,
-        labels: data.genre_distribution.labels,
-        type: 'pie',
-        hole: 0.4,
-        marker: {
-            colors: generateColors(data.genre_distribution.values.length)
-        }
-    }], {
-        title: 'Genre Distribution',
-        template: 'plotly_dark'
-    });
-
-    return div;
-}
-
-function createEscapismTrendPlot(data) {
-    const div = document.createElement('div');
-    div.className = 'plot-container';
-    
-    Plotly.newPlot(div, [{
-        x: data.escapism_trend.dates,
-        y: data.escapism_trend.scores,
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Escapism Score',
-        line: { color: '#e50914' }
-    }], {
-        title: 'Escapism Trend Over Time',
-        xaxis: { title: 'Date' },
-        yaxis: { title: 'Escapism Score' },
-        template: 'plotly_dark'
-    });
-
-    return div;
-}
-
-function createAwardsPlot(data) {
-    const div = document.createElement('div');
-    div.className = 'plot-container';
-    
-    Plotly.newPlot(div, [{
-        x: data.awards.categories,
-        y: data.awards.counts,
-        type: 'bar',
-        marker: {
-            color: generateColors(data.awards.categories.length)
-        }
-    }], {
-        title: 'Awards Distribution',
-        xaxis: { title: 'Award Category' },
-        yaxis: { title: 'Number of Awards' },
-        template: 'plotly_dark'
-    });
-
-    return div;
-}
-
-// Helper functions
-function processYearlyData(data) {
-    return {
-        years: data.map(item => item.year),
-        counts: data.map(item => item.content_count)
-    };
-}
-
-function generateColors(count) {
-    const colors = [];
-    for (let i = 0; i < count; i++) {
-        colors.push(`hsl(${(i * 360) / count}, 70%, 50%)`);
-    }
-    return colors;
-}
-
-function loadGlobalHeatmap() {
-    fetch('/api/global-heatmap')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('visualization-container');
-            container.innerHTML = '';
-            
-            const plot = document.createElement('div');
-            plot.className = 'plot-container';
-            
-            Plotly.newPlot(plot, [{
-                type: 'heatmap',
-                z: data.values,
-                x: data.countries,
-                y: data.metrics,
-                colorscale: 'RdBu'
-            }], {
-                title: 'Global Content Preference Heatmap',
-                template: 'plotly_dark'
-            });
-            
-            container.appendChild(plot);
-        })
-        .catch(error => handleError(error));
-}
-
-function loadPreferenceComparison() {
-    fetch('/api/preference-comparison')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('visualization-container');
-            container.innerHTML = '';
-            
-            const plot = document.createElement('div');
-            plot.className = 'plot-container';
-            
-            Plotly.newPlot(plot, [{
-                type: 'scatter',
-                x: data.escapism_scores,
-                y: data.reality_scores,
-                mode: 'markers+text',
-                text: data.countries,
-                textposition: 'top center',
-                marker: {
-                    size: 12,
-                    color: data.total_content,
-                    colorscale: 'Viridis',
-                    showscale: true
-                }
-            }], {
-                title: 'Escapism vs Reality Content Preferences',
-                xaxis: { title: 'Escapism Score' },
-                yaxis: { title: 'Reality Score' },
-                template: 'plotly_dark'
-            });
-            
-            container.appendChild(plot);
-        })
-        .catch(error => handleError(error));
-}
-
-function loadCovidAnalysis() {
-    fetch('/api/covid-analysis')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('visualization-container');
-            container.innerHTML = '';
-            
-            const plot = document.createElement('div');
-            plot.className = 'plot-container';
-            
-            Plotly.newPlot(plot, [{
-                type: 'scatter',
-                x: data.dates,
-                y: data.content_change,
-                name: 'Content Change',
-                line: { color: '#e50914' }
-            }, {
-                type: 'scatter',
-                x: data.dates,
-                y: data.escapism_trend,
-                name: 'Escapism Trend',
-                line: { color: '#564d4d' }
-            }], {
-                title: 'COVID-19 Impact on Content (2020-2022)',
-                xaxis: { title: 'Date' },
-                yaxis: { title: 'Percentage Change' },
-                template: 'plotly_dark'
-            });
-            
-            container.appendChild(plot);
-        })
-        .catch(error => handleError(error));
-}
-
-function loadPoliticalMatrix() {
-    fetch('/api/political-matrix')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('visualization-container');
-            container.innerHTML = '';
-            
-            const plot = document.createElement('div');
-            plot.className = 'plot-container';
-            
-            Plotly.newPlot(plot, [{
-                type: 'scatter3d',
-                x: data.political_stability,
-                y: data.content_diversity,
-                z: data.viewer_engagement,
-                mode: 'markers+text',
-                text: data.countries,
-                marker: {
-                    size: 8,
-                    color: data.correlation_score,
-                    colorscale: 'Viridis'
-                }
-            }], {
-                title: 'Political Context Matrix',
-                scene: {
-                    xaxis: { title: 'Political Stability' },
-                    yaxis: { title: 'Content Diversity' },
-                    zaxis: { title: 'Viewer Engagement' }
-                },
-                template: 'plotly_dark'
-            });
-            
-            container.appendChild(plot);
-        })
-        .catch(error => handleError(error));
-}
-
-function handleError(error) {
+async function loadView(view) {
     const container = document.getElementById('visualization-container');
-    container.innerHTML = `
-        <div class="error-message">
-            <h3>Error Loading Data</h3>
-            <p>${error.message || 'An unexpected error occurred. Please try again later.'}</p>
-        </div>
+    container.innerHTML = '<div class="loading"></div>';
+
+    try {
+        switch(view) {
+            case 'global-heatmap':
+                await createGlobalHeatmap(container);
+                break;
+            case 'preference-comparison':
+                await createPreferenceComparison(container);
+                break;
+            case 'covid-analysis':
+                await createCovidAnalysis(container);
+                break;
+            case 'political-matrix':
+                await createPoliticalMatrix(container);
+                break;
+            default:
+                container.innerHTML = '<div class="error-message">Invalid view selected</div>';
+        }
+    } catch (error) {
+        showError('Error loading view', error.message);
+    }
+}
+
+// Visualization functions
+async function createGlobalHeatmap(container) {
+    const data = {
+        type: 'choropleth',
+        locations: mockData.countries.map(c => c.name),
+        z: mockData.countries.map(c => c.escapism_score),
+        text: mockData.countries.map(c => c.name),
+        colorscale: 'Reds',
+        colorbar: {
+            title: 'Escapism Score',
+            thickness: 20
+        }
+    };
+
+    const layout = {
+        title: 'Global Content Preferences',
+        geo: {
+            showframe: false,
+            showcoastlines: true,
+            projection: {
+                type: 'mercator'
+            }
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {
+            color: '#ffffff'
+        }
+    };
+
+    Plotly.newPlot(container, [data], layout);
+}
+
+// Error handling
+function showError(title, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
     `;
-    console.error('Error:', error);
+    document.getElementById('visualization-container').appendChild(errorDiv);
+}
+
+// Helper functions for data processing
+function normalizeScore(value, min, max) {
+    return (value - min) / (max - min);
+}
+
+// Export functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        normalizeScore,
+        updateMetricCards,
+        loadView
+    };
 } 

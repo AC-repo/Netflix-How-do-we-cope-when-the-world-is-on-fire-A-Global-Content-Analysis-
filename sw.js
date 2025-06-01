@@ -1,46 +1,28 @@
 const CACHE_NAME = 'netflix-analysis-v1';
-const ASSETS_TO_CACHE = [
-    '/',
-    '/static/css/style.css',
-    '/static/js/main.js',
-    '/static/manifest.json',
-    'https://cdn.plot.ly/plotly-latest.min.js',
-    '/static/icons/icon-72x72.png',
-    '/static/icons/icon-96x96.png',
-    '/static/icons/icon-128x128.png',
-    '/static/icons/icon-144x144.png',
-    '/static/icons/icon-152x152.png',
-    '/static/icons/icon-192x192.png',
-    '/static/icons/icon-384x384.png',
-    '/static/icons/icon-512x512.png'
+const BASE_PATH = '/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-';
+
+const urlsToCache = [
+    `${BASE_PATH}/`,
+    `${BASE_PATH}/index.html`,
+    `${BASE_PATH}/css/style.css`,
+    `${BASE_PATH}/js/main.js`,
+    `${BASE_PATH}/data/mock_data.js`,
+    `${BASE_PATH}/manifest.json`,
+    'https://cdn.plot.ly/plotly-latest.min.js'
 ];
 
-// Install Service Worker
+// Install event - cache initial resources
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                return cache.addAll(ASSETS_TO_CACHE);
+                console.log('Opened cache');
+                return cache.addAll(urlsToCache);
             })
     );
 });
 
-// Activate Service Worker
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
-});
-
-// Fetch Event Strategy
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
@@ -50,7 +32,7 @@ self.addEventListener('fetch', event => {
                     return response;
                 }
 
-                // Clone the request because it's a one-time use stream
+                // Clone the request because it's a stream and can only be consumed once
                 const fetchRequest = event.request.clone();
 
                 return fetch(fetchRequest).then(response => {
@@ -59,20 +41,34 @@ self.addEventListener('fetch', event => {
                         return response;
                     }
 
-                    // Clone the response because it's a one-time use stream
+                    // Clone the response because it's a stream and can only be consumed once
                     const responseToCache = response.clone();
 
                     caches.open(CACHE_NAME)
                         .then(cache => {
-                            // Don't cache API calls
-                            if (!event.request.url.includes('/api/')) {
-                                cache.put(event.request, responseToCache);
-                            }
+                            cache.put(event.request, responseToCache);
                         });
 
                     return response;
                 });
             })
+    );
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
     );
 });
 
