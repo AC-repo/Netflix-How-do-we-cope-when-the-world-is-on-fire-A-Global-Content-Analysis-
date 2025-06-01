@@ -6,9 +6,14 @@ import os
 def process_netflix_data():
     print("Starting data processing...")
     
+    # Get the absolute path to the project root
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    
     # Connect to SQLite database
     try:
-        conn = sqlite3.connect('../netflix_titles.db')
+        db_path = os.path.join(project_root, 'netflix_titles.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
         # Get table schema
@@ -80,10 +85,11 @@ def process_netflix_data():
             netflix_data.append(item)
         
         # Create data directory if it doesn't exist
-        os.makedirs('../data', exist_ok=True)
+        data_dir = os.path.join(project_root, 'data')
+        os.makedirs(data_dir, exist_ok=True)
         
         # Write to JSON file
-        output_file = '../data/netflix_titles.json'
+        output_file = os.path.join(data_dir, 'netflix_titles.json')
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(netflix_data, f, ensure_ascii=False, indent=2)
         

@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Load and display country list
 async function loadCountryList() {
     try {
-        const response = await fetch('data/netflix_titles.json');
+        const response = await fetch(`${BASE_PATH}data/netflix_titles.json`);
         const data = await response.json();
         
         // Get unique countries and their content counts
@@ -102,7 +102,7 @@ async function loadCountryList() {
                 </div>
             `;
             countryItem.addEventListener('click', () => {
-                window.location.href = `templates/country_dashboard.html?country=${encodeURIComponent(country)}`;
+                window.location.href = `${BASE_PATH}templates/country_dashboard.html?country=${encodeURIComponent(country)}`;
             });
             countryList.appendChild(countryItem);
         });
