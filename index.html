@@ -19,7 +19,7 @@
     <!-- Load Plotly.js first -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <!-- Load our application code -->
-    <script type="module" src="js/political_context.js"></script>
+    <script type="module" src="js/visualizations.js"></script>
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -39,10 +39,10 @@
             <div class="nav-section">
                 <h3>Global Views</h3>
                 <ul role="list" aria-label="Global views">
-                    <li><a href="#global-heatmap" data-view="global-heatmap">Global Heatmap</a></li>
-                    <li><a href="#preference-comparison" data-view="preference-comparison">Preference Comparison</a></li>
-                    <li><a href="#covid-content-stats" data-view="covid-analysis">COVID-19 Impact</a></li>
-                    <li><a href="#political-matrix" data-view="political-matrix">Political Context</a></li>
+                    <li><a href="#global-heatmap">Global Heatmap</a></li>
+                    <li><a href="#preference-comparison">Preference Comparison</a></li>
+                    <li><a href="#covid-content-stats">COVID-19 Impact</a></li>
+                    <li><a href="#political-matrix">Political Context</a></li>
                 </ul>
             </div>
         </div>
@@ -60,6 +60,11 @@
                 <h3>Most Reality-Based Country</h3>
                 <div id="most-reality-country" class="metric-value"></div>
                 <div id="most-reality-score" class="metric-score"></div>
+            </div>
+            <div class="metric-card">
+                <h3>COVID-19 Impact</h3>
+                <div id="covid-impact-score" class="metric-value">72.0%</div>
+                <div class="metric-trend">Trend: increasing</div>
             </div>
         </section>
 

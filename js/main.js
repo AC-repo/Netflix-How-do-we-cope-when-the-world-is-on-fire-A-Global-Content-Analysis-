@@ -1,5 +1,6 @@
 // Import dependencies
 import PoliticalContext from './political_context.js';
+import NetflixVisualizations from './visualizations.js';
 
 // Global state
 let netflixData = [];
@@ -24,9 +25,9 @@ const mockData = {
 };
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    loadCountryList();
-    initGlobalVisualizations();
+document.addEventListener('DOMContentLoaded', async () => {
+    const visualizations = new NetflixVisualizations();
+    await visualizations.initialize();
 });
 
 // Load and display country list
