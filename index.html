@@ -18,10 +18,9 @@
     
     <!-- Load Plotly.js first -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- Load our mock data -->
-    <script src="data/mock_data.js"></script>
-    <!-- Load our main application code -->
-    <script src="js/main.js" defer></script>
+    <!-- Load our application code -->
+    <script type="module" src="js/political_context.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -34,13 +33,13 @@
             <h2 class="sr-only">Navigation Menu</h2>
             <div class="nav-section">
                 <h3>Countries</h3>
-                <ul id="countryList" role="list" aria-label="Country list"></ul>
+                <div id="country-list" role="list" aria-label="Country list"></div>
             </div>
             
             <div class="nav-section">
                 <h3>Global Views</h3>
                 <ul role="list" aria-label="Global views">
-                    <li><a href="#" data-view="global-heatmap" role="button" aria-label="View global heatmap">Global Heatmap</a></li>
+                    <li><a href="#" data-view="global-map" role="button" aria-label="View global map">Global Map</a></li>
                     <li><a href="#" data-view="preference-comparison" role="button" aria-label="View preference comparison">Preference Comparison</a></li>
                     <li><a href="#" data-view="covid-analysis" role="button" aria-label="View COVID-19 impact">COVID-19 Impact</a></li>
                     <li><a href="#" data-view="political-matrix" role="button" aria-label="View political context">Political Context</a></li>
@@ -50,25 +49,10 @@
     </nav>
 
     <main class="content" id="main-content" role="main">
-        <h2 class="sr-only">Key Metrics and Visualizations</h2>
-        <div class="key-metrics" role="region" aria-label="Key metrics">
-            <div class="metric-card" id="most-escapist" role="article" aria-labelledby="escapist-title">
-                <h3 id="escapist-title">Most Escapist Country</h3>
-                <div class="loading" role="status" aria-label="Loading data"></div>
-            </div>
-            <div class="metric-card" id="most-reality" role="article" aria-labelledby="reality-title">
-                <h3 id="reality-title">Most Reality-Based Country</h3>
-                <div class="loading" role="status" aria-label="Loading data"></div>
-            </div>
-            <div class="metric-card" id="covid-impact" role="article" aria-labelledby="covid-title">
-                <h3 id="covid-title">COVID-19 Impact Score</h3>
-                <div class="loading" role="status" aria-label="Loading data"></div>
-            </div>
-        </div>
-
-        <div id="visualization-container" role="region" aria-label="Data visualizations">
-            <div class="loading" role="status" aria-label="Loading visualization"></div>
-        </div>
+        <div id="map" class="visualization"></div>
+        <div id="preference-comparison" class="visualization"></div>
+        <div id="covid-content-stats" class="visualization"></div>
+        <div id="country-comparison-chart" class="visualization"></div>
     </main>
 
     <script>

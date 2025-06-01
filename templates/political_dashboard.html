@@ -1,0 +1,106 @@
+<!-- Political Context Dashboard -->
+<div id="political-dashboard" class="dashboard-container">
+  <h2>Political Context Analysis</h2>
+  
+  <!-- COVID-19 Timeline Analysis -->
+  <section class="timeline-section">
+    <h3>Content During COVID-19 Pandemic</h3>
+    <div class="timeline-info">
+      <p>Analysis Period: January 30, 2020 - December 31, 2022</p>
+      <p class="timeline-note">* Based on WHO's Public Health Emergency declaration through end of 2022</p>
+    </div>
+    <div id="covid-content-stats"></div>
+  </section>
+
+  <!-- Political Context Scores -->
+  <section class="scores-section">
+    <h3>Political Context Scores</h3>
+    <div class="score-grid">
+      <div class="score-card">
+        <h4>Freedom Score</h4>
+        <div id="freedom-score" class="score-value"></div>
+      </div>
+      <div class="score-card">
+        <h4>Internet Freedom</h4>
+        <div id="internet-score" class="score-value"></div>
+      </div>
+      <div class="score-card">
+        <h4>Press Freedom</h4>
+        <div id="press-score" class="score-value"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Country Comparison -->
+  <section class="comparison-section">
+    <h3>Country Comparison</h3>
+    <div id="country-comparison-chart"></div>
+  </section>
+
+  <!-- Data Attribution -->
+  <footer class="dashboard-footer">
+    <p class="data-attribution">* Information sourced from Human Rights Watch World Reports and United Nations public data</p>
+  </footer>
+</div>
+
+<style>
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.timeline-section,
+.scores-section,
+.comparison-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-info {
+  margin: 15px 0;
+}
+
+.timeline-note {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.score-card {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.score-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 10px 0;
+}
+
+.dashboard-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.data-attribution {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
+</style> 

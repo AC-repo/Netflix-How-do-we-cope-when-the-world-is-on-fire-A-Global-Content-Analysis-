@@ -77,4 +77,80 @@ Reach out via [GitHub Issues](https://github.com/AC-repo) or email me at `[conta
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+# Netflix Content Analysis
+
+A web application that analyzes global Netflix content trends and their relationship with political and social contexts.
+
+## Features
+
+- Global content distribution visualization
+- Content preference analysis by country
+- COVID-19 impact timeline analysis
+- Political context matrix
+- Mobile-friendly responsive design
+- Progressive Web App (PWA) support
+
+## Data Processing
+
+The application processes Netflix content data with the following features:
+- 8,807 titles across 90 unique countries
+- Standardized date formats (YYYY-MM-DD)
+- Single country per title (primary country only)
+- Primary genre categorization
+- Political context scoring
+
+## Development Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-.git
+cd Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-
+```
+
+2. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Process the data:
+```bash
+cd scripts
+python clean_data.py
+```
+
+4. Serve the application:
+```bash
+python -m http.server 8000
+```
+
+5. Open http://localhost:8000 in your browser
+
+## Deployment
+
+The application is configured for GitHub Pages deployment:
+
+1. Base path is set to `/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/`
+2. All resource paths are relative to the base path
+3. Service Worker is configured for offline support
+4. CORS headers are set for JSON data access
+
+## Browser Compatibility
+
+Tested and working on:
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- Mobile browsers (iOS Safari, Chrome for Android)
+
+## Data Sources
+
+- Netflix Titles Database
+- Political Context Data
+- COVID-19 Timeline Data
+
+## License
+
+MIT License 
