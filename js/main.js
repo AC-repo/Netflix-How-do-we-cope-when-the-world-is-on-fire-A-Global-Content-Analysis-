@@ -90,12 +90,17 @@ function populateCountryList(countries) {
     const countryList = document.getElementById('countryList');
     countryList.innerHTML = countries.map(country => `
         <li>
-            <a href="#" data-country="${country.name}">${country.name}</a>
+            <a href="#" data-country="${country.name}" class="country-link">
+                ${country.name}
+                <span class="country-score">
+                    ${country.escapism_score > country.reality_score ? 'Escapist' : 'Reality-Based'}
+                </span>
+            </a>
         </li>
     `).join('');
 
     // Add click handlers for country selection
-    countryList.querySelectorAll('a').forEach(link => {
+    countryList.querySelectorAll('.country-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const country = e.target.dataset.country;
@@ -135,13 +140,21 @@ async function createGlobalHeatmap(container) {
     const data = {
         type: 'choropleth',
         locations: mockData.countries.map(c => c.name),
+        locationmode: 'country names',
         z: mockData.countries.map(c => c.escapism_score),
-        text: mockData.countries.map(c => c.name),
+        text: mockData.countries.map(c => 
+            `${c.name}<br>` +
+            `Escapism Score: ${(c.escapism_score * 100).toFixed(1)}%<br>` +
+            `Reality Score: ${(c.reality_score * 100).toFixed(1)}%<br>` +
+            `Preference: ${c.escapism_score > c.reality_score ? 'Escapist' : 'Reality-Based'}`
+        ),
         colorscale: 'Reds',
         colorbar: {
             title: 'Escapism Score',
-            thickness: 20
-        }
+            thickness: 20,
+            tickformat: '.0%'
+        },
+        hoverinfo: 'text'
     };
 
     const layout = {
@@ -150,17 +163,95 @@ async function createGlobalHeatmap(container) {
             showframe: false,
             showcoastlines: true,
             projection: {
-                type: 'mercator'
+                type: 'equirectangular',
+                scale: 1.5
+            },
+            lonaxis: {
+                range: [-180, 180]
+            },
+            lataxis: {
+                range: [-60, 90]
             }
         },
+        width: container.offsetWidth,
+        height: container.offsetHeight || 600,
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         font: {
-            color: '#ffffff'
+            color: '#ffffff',
+            size: 14
+        },
+        margin: {
+            l: 0,
+            r: 0,
+            t: 40,
+            b: 0
         }
     };
 
-    Plotly.newPlot(container, [data], layout);
+    const config = {
+        responsive: true,
+        displayModeBar: false
+    };
+
+    Plotly.newPlot(container, [data], layout, config);
+}
+
+async function createPreferenceComparison(container) {
+    const data = [{
+        type: 'scatter',
+        mode: 'markers+text',
+        x: mockData.countries.map(c => c.escapism_score),
+        y: mockData.countries.map(c => c.reality_score),
+        text: mockData.countries.map(c => c.name),
+        textposition: 'top center',
+        marker: {
+            size: 12,
+            color: mockData.countries.map(c => c.covid_impact),
+            colorscale: 'Viridis',
+            showscale: true,
+            colorbar: {
+                title: 'COVID-19 Impact'
+            }
+        },
+        hovertemplate:
+            '<b>%{text}</b><br>' +
+            'Escapism: %{x:.1%}<br>' +
+            'Reality: %{y:.1%}<br>' +
+            '<extra></extra>'
+    }];
+
+    const layout = {
+        title: 'Content Preference Comparison',
+        xaxis: {
+            title: 'Escapism Score',
+            tickformat: '.0%',
+            gridcolor: '#444',
+            zerolinecolor: '#666'
+        },
+        yaxis: {
+            title: 'Reality Score',
+            tickformat: '.0%',
+            gridcolor: '#444',
+            zerolinecolor: '#666'
+        },
+        width: container.offsetWidth,
+        height: container.offsetHeight || 600,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {
+            color: '#ffffff',
+            size: 14
+        },
+        showlegend: false
+    };
+
+    const config = {
+        responsive: true,
+        displayModeBar: false
+    };
+
+    Plotly.newPlot(container, data, layout, config);
 }
 
 // Error handling
@@ -178,6 +269,14 @@ function showError(title, message) {
 function normalizeScore(value, min, max) {
     return (value - min) / (max - min);
 }
+
+// Window resize handler
+window.addEventListener('resize', () => {
+    const container = document.getElementById('visualization-container');
+    if (container.data) {
+        Plotly.Plots.resize(container);
+    }
+});
 
 // Export functions for testing
 if (typeof module !== 'undefined' && module.exports) {

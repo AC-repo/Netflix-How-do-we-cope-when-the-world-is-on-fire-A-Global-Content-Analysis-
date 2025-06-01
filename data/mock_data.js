@@ -9,7 +9,17 @@ const MOCK_DATA = {
         { name: 'Spain', escapism_score: 0.82, reality_score: 0.48, covid_impact: 0.73 },
         { name: 'Canada', escapism_score: 0.76, reality_score: 0.52, covid_impact: 0.69 },
         { name: 'Australia', escapism_score: 0.79, reality_score: 0.49, covid_impact: 0.71 },
-        { name: 'Brazil', escapism_score: 0.88, reality_score: 0.38, covid_impact: 0.78 }
+        { name: 'Brazil', escapism_score: 0.88, reality_score: 0.38, covid_impact: 0.78 },
+        { name: 'Mexico', escapism_score: 0.86, reality_score: 0.41, covid_impact: 0.76 },
+        { name: 'Argentina', escapism_score: 0.83, reality_score: 0.44, covid_impact: 0.74 },
+        { name: 'South Korea', escapism_score: 0.87, reality_score: 0.39, covid_impact: 0.77 },
+        { name: 'India', escapism_score: 0.89, reality_score: 0.37, covid_impact: 0.79 },
+        { name: 'China', escapism_score: 0.84, reality_score: 0.43, covid_impact: 0.75 },
+        { name: 'Russia', escapism_score: 0.81, reality_score: 0.46, covid_impact: 0.72 },
+        { name: 'South Africa', escapism_score: 0.80, reality_score: 0.47, covid_impact: 0.71 },
+        { name: 'Nigeria', escapism_score: 0.85, reality_score: 0.42, covid_impact: 0.74 },
+        { name: 'Egypt', escapism_score: 0.82, reality_score: 0.45, covid_impact: 0.73 },
+        { name: 'Saudi Arabia', escapism_score: 0.88, reality_score: 0.36, covid_impact: 0.78 }
     ],
     
     political_context: {
@@ -22,7 +32,17 @@ const MOCK_DATA = {
         'Spain': { freedom_score: 92, press_freedom: 82, internet_freedom: 77 },
         'Canada': { freedom_score: 98, press_freedom: 87, internet_freedom: 87 },
         'Australia': { freedom_score: 97, press_freedom: 84, internet_freedom: 83 },
-        'Brazil': { freedom_score: 75, press_freedom: 69, internet_freedom: 64 }
+        'Brazil': { freedom_score: 75, press_freedom: 69, internet_freedom: 64 },
+        'Mexico': { freedom_score: 62, press_freedom: 46, internet_freedom: 60 },
+        'Argentina': { freedom_score: 85, press_freedom: 71, internet_freedom: 71 },
+        'South Korea': { freedom_score: 83, press_freedom: 73, internet_freedom: 70 },
+        'India': { freedom_score: 67, press_freedom: 55, internet_freedom: 51 },
+        'China': { freedom_score: 9, press_freedom: 7, internet_freedom: 10 },
+        'Russia': { freedom_score: 19, press_freedom: 30, internet_freedom: 30 },
+        'South Africa': { freedom_score: 79, press_freedom: 73, internet_freedom: 70 },
+        'Nigeria': { freedom_score: 45, press_freedom: 39, internet_freedom: 42 },
+        'Egypt': { freedom_score: 18, press_freedom: 26, internet_freedom: 27 },
+        'Saudi Arabia': { freedom_score: 7, press_freedom: 10, internet_freedom: 24 }
     },
 
     covid_timeline: {

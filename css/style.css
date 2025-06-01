@@ -176,7 +176,80 @@ body {
     border-radius: 8px;
     padding: 20px;
     margin-top: 20px;
-    min-height: 400px;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Country List Styling */
+.country-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.country-score {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background-color: var(--netflix-dark-gray);
+    color: var(--netflix-light-gray);
+}
+
+.country-link:hover .country-score,
+.country-link.active .country-score {
+    background-color: var(--netflix-red);
+    color: var(--netflix-white);
+}
+
+/* Map Visualization */
+.js-plotly-plot {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.plot-container {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+
+/* Responsive Adjustments */
+@media (min-width: 1200px) {
+    #visualization-container {
+        min-height: 700px;
+    }
+}
+
+@media (max-width: 768px) {
+    #visualization-container {
+        min-height: 400px;
+    }
+}
+
+/* Loading State */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Hover Effects */
+.country-hover {
+    position: absolute;
+    background-color: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--netflix-red);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1000;
+    color: var(--netflix-white);
+    max-width: 250px;
 }
 
 /* Mobile Responsiveness */
