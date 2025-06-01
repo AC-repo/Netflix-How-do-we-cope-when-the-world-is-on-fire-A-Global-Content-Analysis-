@@ -39,20 +39,52 @@
             <div class="nav-section">
                 <h3>Global Views</h3>
                 <ul role="list" aria-label="Global views">
-                    <li><a href="#" data-view="global-map" role="button" aria-label="View global map">Global Map</a></li>
-                    <li><a href="#" data-view="preference-comparison" role="button" aria-label="View preference comparison">Preference Comparison</a></li>
-                    <li><a href="#" data-view="covid-analysis" role="button" aria-label="View COVID-19 impact">COVID-19 Impact</a></li>
-                    <li><a href="#" data-view="political-matrix" role="button" aria-label="View political context">Political Context</a></li>
+                    <li><a href="#global-heatmap" data-view="global-heatmap">Global Heatmap</a></li>
+                    <li><a href="#preference-comparison" data-view="preference-comparison">Preference Comparison</a></li>
+                    <li><a href="#covid-content-stats" data-view="covid-analysis">COVID-19 Impact</a></li>
+                    <li><a href="#political-matrix" data-view="political-matrix">Political Context</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <main class="content" id="main-content" role="main">
-        <div id="map" class="visualization"></div>
-        <div id="preference-comparison" class="visualization"></div>
-        <div id="covid-content-stats" class="visualization"></div>
-        <div id="country-comparison-chart" class="visualization"></div>
+        <!-- Global Metrics Cards -->
+        <section class="metrics-overview">
+            <div class="metric-card">
+                <h3>Most Escapist Country</h3>
+                <div id="most-escapist-country" class="metric-value"></div>
+                <div id="most-escapist-score" class="metric-score"></div>
+            </div>
+            <div class="metric-card">
+                <h3>Most Reality-Based Country</h3>
+                <div id="most-reality-country" class="metric-value"></div>
+                <div id="most-reality-score" class="metric-score"></div>
+            </div>
+        </section>
+
+        <!-- Global Visualizations -->
+        <section class="visualizations">
+            <div id="global-heatmap" class="visualization">
+                <h2>Global Content Distribution</h2>
+                <div class="chart-container"></div>
+            </div>
+
+            <div id="preference-comparison" class="visualization">
+                <h2>Content Preferences by Country</h2>
+                <div class="chart-container"></div>
+            </div>
+
+            <div id="covid-content-stats" class="visualization">
+                <h2>COVID-19 Impact Analysis</h2>
+                <div class="chart-container"></div>
+            </div>
+
+            <div id="political-matrix" class="visualization">
+                <h2>Political Context Analysis</h2>
+                <div class="chart-container"></div>
+            </div>
+        </section>
     </main>
 
     <script>
