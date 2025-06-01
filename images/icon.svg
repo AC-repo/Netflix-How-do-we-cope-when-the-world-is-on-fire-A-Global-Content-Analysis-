@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <rect width="512" height="512" fill="#141414"/>
+    <text x="256" y="256" font-family="Arial Black" font-size="240" fill="#E50914" text-anchor="middle" dominant-baseline="middle">N</text>
+    <g transform="translate(256, 320)">
+        <text x="0" y="0" font-family="Arial" font-size="48" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">Analysis</text>
+    </g>
+</svg> 
