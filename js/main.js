@@ -25,9 +25,146 @@ const mockData = {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    initializeNavigation();
-    initializeData();
+    loadCountryList();
+    initGlobalVisualizations();
 });
+
+// Load and display country list
+async function loadCountryList() {
+    try {
+        const response = await fetch('data/netflix_titles.json');
+        const data = await response.json();
+        
+        // Get unique countries and their content counts
+        const countryStats = {};
+        data.forEach(item => {
+            if (item.country) {
+                if (!countryStats[item.country]) {
+                    countryStats[item.country] = {
+                        total: 0,
+                        movies: 0,
+                        shows: 0
+                    };
+                }
+                countryStats[item.country].total++;
+                if (item.type === 'Movie') {
+                    countryStats[item.country].movies++;
+                } else {
+                    countryStats[item.country].shows++;
+                }
+            }
+        });
+
+        // Sort countries by total content
+        const sortedCountries = Object.entries(countryStats)
+            .sort((a, b) => b[1].total - a[1].total);
+
+        // Create country list HTML
+        const countryList = document.getElementById('country-list');
+        sortedCountries.forEach(([country, stats]) => {
+            const countryItem = document.createElement('div');
+            countryItem.className = 'country-item';
+            countryItem.innerHTML = `
+                <div class="country-name">${country}</div>
+                <div class="country-stats">
+                    <span class="total">${stats.total} titles</span>
+                    <span class="movies">${stats.movies} movies</span>
+                    <span class="shows">${stats.shows} shows</span>
+                </div>
+            `;
+            countryItem.addEventListener('click', () => {
+                window.location.href = `templates/country_dashboard.html?country=${encodeURIComponent(country)}`;
+            });
+            countryList.appendChild(countryItem);
+        });
+    } catch (error) {
+        console.error('Error loading country data:', error);
+    }
+}
+
+// Initialize global visualizations
+async function initGlobalVisualizations() {
+    try {
+        const response = await fetch('data/netflix_titles.json');
+        const data = await response.json();
+
+        // Create global heatmap
+        createGlobalHeatmap(data);
+        
+        // Create preference comparison
+        createPreferenceComparison(data);
+        
+        // Create COVID-19 impact analysis
+        createCovidAnalysis(data);
+        
+        // Create political context matrix
+        createPoliticalMatrix(data);
+    } catch (error) {
+        console.error('Error initializing visualizations:', error);
+    }
+}
+
+// Create global heatmap visualization
+function createGlobalHeatmap(data) {
+    const countryGenres = {};
+    data.forEach(item => {
+        if (item.country && item.listed_in) {
+            if (!countryGenres[item.country]) {
+                countryGenres[item.country] = {};
+            }
+            if (!countryGenres[item.country][item.listed_in]) {
+                countryGenres[item.country][item.listed_in] = 0;
+            }
+            countryGenres[item.country][item.listed_in]++;
+        }
+    });
+
+    // Convert to Plotly format
+    const countries = Object.keys(countryGenres);
+    const genres = [...new Set(data.map(item => item.listed_in))];
+    const values = countries.map(country => 
+        genres.map(genre => countryGenres[country][genre] || 0)
+    );
+
+    const trace = {
+        z: values,
+        x: genres,
+        y: countries,
+        type: 'heatmap',
+        colorscale: 'Reds'
+    };
+
+    const layout = {
+        title: 'Global Content Distribution by Genre',
+        xaxis: {
+            title: 'Genre',
+            tickangle: 45
+        },
+        yaxis: {
+            title: 'Country'
+        }
+    };
+
+    Plotly.newPlot('global-heatmap', [trace], layout);
+}
+
+// Create preference comparison visualization
+function createPreferenceComparison(data) {
+    // Implementation for preference comparison
+    // This will show how different countries prefer different types of content
+}
+
+// Create COVID-19 impact analysis
+function createCovidAnalysis(data) {
+    // Implementation for COVID-19 impact analysis
+    // This will show content trends during the pandemic period
+}
+
+// Create political context matrix
+function createPoliticalMatrix(data) {
+    // Implementation for political context matrix
+    // This will show relationship between content and political context
+}
 
 // Navigation handling
 function initializeNavigation() {
@@ -125,118 +262,6 @@ function createGlobalMap() {
     };
 
     Plotly.newPlot('map', data, layout, {responsive: true});
-}
-
-// Create preference comparison visualization
-function createPreferenceComparison() {
-    const countries = getTopCountries(20);
-    
-    const data = [{
-        type: 'bar',
-        x: countries,
-        y: countries.map(country => calculateEscapismScore(country)),
-        name: 'Escapism Score',
-        marker: {
-            color: '#fb6a4a'
-        }
-    }, {
-        type: 'bar',
-        x: countries,
-        y: countries.map(country => calculateRealityScore(country)),
-        name: 'Reality Score',
-        marker: {
-            color: '#6baed6'
-        }
-    }];
-
-    const layout = {
-        title: 'Content Preference Comparison',
-        barmode: 'group',
-        xaxis: {
-            title: 'Country',
-            tickangle: -45
-        },
-        yaxis: {
-            title: 'Score',
-            range: [0, 1]
-        },
-        height: 500,
-        margin: {
-            b: 100
-        }
-    };
-
-    Plotly.newPlot('preference-comparison', data, layout, {responsive: true});
-}
-
-// Create COVID analysis visualization
-function createCovidAnalysis() {
-    const covidData = netflixData.filter(item => {
-        const date = new Date(item.date_added);
-        return date >= new Date(PoliticalContext.covidTimeline.startDate) &&
-               date <= new Date(PoliticalContext.covidTimeline.endDate);
-    });
-
-    const monthlyData = groupByMonth(covidData);
-    
-    const data = [{
-        type: 'scatter',
-        x: Object.keys(monthlyData),
-        y: Object.values(monthlyData).map(d => d.count),
-        mode: 'lines+markers',
-        name: 'Content Additions'
-    }];
-
-    const layout = {
-        title: 'Content Additions During COVID-19 Pandemic',
-        xaxis: {
-            title: 'Month',
-            tickangle: -45
-        },
-        yaxis: {
-            title: 'Number of Titles Added'
-        },
-        height: 400
-    };
-
-    Plotly.newPlot('covid-content-stats', data, layout);
-}
-
-// Create political context matrix
-function createPoliticalMatrix() {
-    const countries = getTopCountries(20);
-    const years = [2020, 2021, 2022];
-    
-    const data = years.map(year => ({
-        type: 'heatmap',
-        z: countries.map(country => [
-            PoliticalContext.getFreedomScore(country, year),
-            PoliticalContext.getInternetScore(country, year),
-            PoliticalContext.getPressScore(country, year)
-        ]),
-        x: ['Freedom', 'Internet', 'Press'],
-        y: countries,
-        name: year.toString()
-    }));
-
-    const layout = {
-        title: 'Political Context Matrix',
-        grid: {rows: 1, columns: 3, pattern: 'independent'},
-        annotations: [{
-            text: PoliticalContext.dataSourceNotice,
-            showarrow: false,
-            x: 0.5,
-            y: -0.15,
-            xref: 'paper',
-            yref: 'paper',
-            font: {
-                size: 10,
-                color: '#666'
-            }
-        }]
-    };
-
-    Plotly.newPlot('country-comparison-chart', data, layout);
 }
 
 // Update country list in sidebar

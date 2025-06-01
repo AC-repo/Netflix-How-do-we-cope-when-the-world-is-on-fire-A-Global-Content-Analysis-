@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Analysis - Country Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="country-dashboard">
+        <header>
+            <h1 id="country-title">Country Analysis</h1>
+            <div class="time-range">
+                <span>Period: 2016-2024</span>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Content Timeline Section -->
+            <section class="dashboard-section" id="content-timeline">
+                <h2>Content Trend Timeline</h2>
+                <div class="chart" id="content-volume-chart"></div>
+                <div class="chart" id="genre-breakdown-chart"></div>
+                <div class="chart" id="political-overlay-chart"></div>
+            </section>
+
+            <!-- Genre Performance Section -->
+            <section class="dashboard-section" id="genre-performance">
+                <h2>Genre Performance</h2>
+                <div class="chart" id="awards-by-genre-chart"></div>
+                <div class="chart" id="runtime-genre-chart"></div>
+                <div class="chart" id="popular-acclaimed-chart"></div>
+            </section>
+
+            <!-- Political Context Section -->
+            <section class="dashboard-section" id="political-context">
+                <h2>Content in Political Context</h2>
+                <div class="chart" id="conflict-content-chart"></div>
+                <div class="chart" id="themes-wordcloud"></div>
+                <div class="chart" id="political-clusters"></div>
+            </section>
+
+            <!-- Escapism Index Section -->
+            <section class="dashboard-section" id="escapism-index">
+                <h2>Escapism Analysis</h2>
+                <div class="metric-card">
+                    <h3>Most Escapist Year</h3>
+                    <div id="escapist-year"></div>
+                    <p id="escapist-explanation"></p>
+                </div>
+                <div class="chart" id="escapism-trend-chart"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="../js/plotly-config.js"></script>
+    <script src="../js/country-dashboard.js"></script>
+</body>
+</html> 
