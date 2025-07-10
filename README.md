@@ -122,10 +122,10 @@ python clean_data.py
 
 4. Serve the application:
 ```bash
-python -m http.server 8000
+python app.py
 ```
 
-5. Open http://localhost:8000 in your browser
+5. Open http://localhost:5000 in your browser
 
 ## Deployment
 
@@ -154,3 +154,7 @@ Tested and working on:
 ## License
 
 MIT License 
+
+## 🗂️ Irrelevant Old Stuff
+
+Legacy scripts, system files, and database GUI project files that are not part of the current dashboard pipeline have been moved to the `irrelevant_old_stuff/` folder for repository hygiene. You can safely ignore this folder for all development and deployment purposes. 

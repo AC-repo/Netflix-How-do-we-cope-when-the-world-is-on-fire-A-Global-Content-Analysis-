@@ -1,13 +1,13 @@
-// Import dependencies
-import PoliticalContext from './political_context.js';
+// Import visualization manager
 import NetflixVisualizations from './visualizations.js';
 
 // Global state
 let netflixData = [];
-let selectedCountries = [];
+let countryData = {};
+let selectedCountry = null;
 
 // Constants
-const BASE_PATH = '/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/';
+const BASE_PATH = '/';
 
 // Mock data for initial load
 const mockData = {
@@ -24,11 +24,290 @@ const mockData = {
     }
 };
 
+// Initialize visualizations
+const visualizations = new NetflixVisualizations();
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
-    const visualizations = new NetflixVisualizations();
-    await visualizations.initialize();
+    try {
+        await visualizations.initialize();
+        
+        // Set up navigation
+        setupNavigation();
+        
+        // Initialize country dashboards
+        initializeCountryDashboards();
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('ServiceWorker registration successful'))
+                .catch(err => console.error('ServiceWorker registration failed:', err));
+        }
+    } catch (error) {
+        console.error('Error initializing application:', error);
+        showError('Failed to initialize application');
+    }
 });
+
+// Process the Netflix data to extract country information
+function processCountryData(data) {
+    const countries = {};
+    
+    data.forEach(item => {
+        if (!item.country) return;
+        
+        const countryList = item.country.split(',').map(c => c.trim()).filter(Boolean);
+        countryList.forEach(country => {
+            if (!countries[country]) {
+                countries[country] = {
+                    titles: [],
+                    genres: {},
+                    total: 0,
+                    movies: 0,
+                    shows: 0,
+                    releases_by_year: {},
+                    directors: new Set(),
+                    cast: new Set()
+                };
+            }
+            
+            countries[country].titles.push(item);
+            countries[country].total++;
+            
+            // Track type counts
+            if (item.type === 'Movie') {
+                countries[country].movies++;
+            } else {
+                countries[country].shows++;
+            }
+            
+            // Track genres
+            if (item.listed_in) {
+                const genres = item.listed_in.split(',').map(g => g.trim());
+                genres.forEach(genre => {
+                    countries[country].genres[genre] = (countries[country].genres[genre] || 0) + 1;
+                });
+            }
+            
+            // Track release year
+            if (item.release_year) {
+                countries[country].releases_by_year[item.release_year] = 
+                    (countries[country].releases_by_year[item.release_year] || 0) + 1;
+            }
+            
+            // Track directors
+            if (item.director) {
+                item.director.split(',').map(d => d.trim()).forEach(director => {
+                    countries[country].directors.add(director);
+                });
+            }
+            
+            // Track cast
+            if (item.cast) {
+                item.cast.split(',').map(c => c.trim()).forEach(actor => {
+                    countries[country].cast.add(actor);
+                });
+            }
+        });
+    });
+    
+    return countries;
+}
+
+// Update the country list in the sidebar
+function updateCountryList() {
+    const countryList = document.getElementById('country-list');
+    if (!countryList) return;
+    
+    countryList.innerHTML = '';
+    
+    // Sort countries by total content
+    Object.entries(countryData)
+        .sort(([, a], [, b]) => b.total - a.total)
+        .forEach(([country, stats]) => {
+            const countryItem = document.createElement('div');
+            countryItem.className = 'country-item';
+            if (selectedCountry === country) {
+                countryItem.classList.add('selected');
+            }
+            
+            // Find most popular genre
+            const mostPopularGenre = Object.entries(stats.genres)
+                .sort(([, a], [, b]) => b - a)[0]?.[0] || 'N/A';
+            
+            countryItem.innerHTML = `
+                <div class="country-name">${country}</div>
+                <div class="country-stats">
+                    <span class="total">${stats.total} titles</span>
+                    <span class="movies">${stats.movies} movies</span>
+                    <span class="shows">${stats.shows} shows</span>
+                    <span class="popular-genre">Top: ${mostPopularGenre}</span>
+                </div>
+            `;
+            
+            countryItem.addEventListener('click', () => {
+                selectedCountry = country;
+                updateCountryList(); // Refresh selection state
+                showCountryDetails(country, stats);
+            });
+            
+            countryList.appendChild(countryItem);
+        });
+}
+
+// Show detailed country analysis
+function showCountryDetails(country, stats) {
+    const container = document.querySelector('.content');
+    if (!container) return;
+
+    // Create the details section
+    const detailsSection = document.createElement('div');
+    detailsSection.className = 'country-details';
+    
+    // Basic stats
+    detailsSection.innerHTML = `
+        <h2>${country}</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Content</h3>
+                <p>${stats.total} titles</p>
+            </div>
+            <div class="stat-card">
+                <h3>Movies</h3>
+                <p>${stats.movies} titles</p>
+            </div>
+            <div class="stat-card">
+                <h3>TV Shows</h3>
+                <p>${stats.shows} titles</p>
+            </div>
+            <div class="stat-card">
+                <h3>Unique Directors</h3>
+                <p>${stats.directors.size}</p>
+            </div>
+        </div>
+        <div class="charts-container">
+            <div id="genre-distribution" class="chart"></div>
+            <div id="yearly-releases" class="chart"></div>
+            <div id="content-type-ratio" class="chart"></div>
+        </div>
+        <div class="content-analysis">
+            <h3>Recent Releases</h3>
+            <div id="recent-titles" class="titles-grid"></div>
+        </div>
+    `;
+
+    // Replace existing content
+    container.innerHTML = '';
+    container.appendChild(detailsSection);
+
+    // Create visualizations
+    createGenreDistribution(stats);
+    createYearlyTrend(stats);
+    createContentTypeRatio(stats);
+    showRecentTitles(stats);
+}
+
+// Create genre distribution chart
+function createGenreDistribution(stats) {
+    const genres = Object.entries(stats.genres)
+        .sort(([,a], [,b]) => b-a)
+        .slice(0, 10); // Top 10 genres
+
+    const trace = {
+        x: genres.map(([genre]) => genre),
+        y: genres.map(([,count]) => count),
+        type: 'bar',
+        marker: {
+            color: '#E50914'
+        }
+    };
+
+    const layout = {
+        title: 'Top 10 Genres',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#ffffff' },
+        xaxis: { tickangle: 45 },
+        yaxis: { title: 'Number of Titles' },
+        margin: { b: 120 }
+    };
+
+    Plotly.newPlot('genre-distribution', [trace], layout);
+}
+
+// Create yearly trend chart
+function createYearlyTrend(stats) {
+    const years = Object.keys(stats.releases_by_year).sort();
+    const counts = years.map(year => stats.releases_by_year[year]);
+
+    const trace = {
+        x: years,
+        y: counts,
+        type: 'scatter',
+        mode: 'lines+markers',
+        line: { color: '#E50914' }
+    };
+
+    const layout = {
+        title: 'Content Release Trend',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#ffffff' },
+        xaxis: { title: 'Year' },
+        yaxis: { title: 'Number of Releases' }
+    };
+
+    Plotly.newPlot('yearly-releases', [trace], layout);
+}
+
+// Create content type ratio pie chart
+function createContentTypeRatio(stats) {
+    const trace = {
+        values: [stats.movies, stats.shows],
+        labels: ['Movies', 'TV Shows'],
+        type: 'pie',
+        marker: {
+            colors: ['#E50914', '#831010']
+        }
+    };
+
+    const layout = {
+        title: 'Content Type Distribution',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: { color: '#ffffff' }
+    };
+
+    Plotly.newPlot('content-type-ratio', [trace], layout);
+}
+
+// Show recent titles
+function showRecentTitles(stats) {
+    const recentTitles = stats.titles
+        .sort((a, b) => b.release_year - a.release_year)
+        .slice(0, 6);
+
+    const container = document.getElementById('recent-titles');
+    if (!container) return;
+
+    container.innerHTML = recentTitles.map(title => `
+        <div class="title-card">
+            <h4>${title.title}</h4>
+            <p class="type">${title.type}</p>
+            <p class="year">${title.release_year}</p>
+            <p class="genre">${title.listed_in}</p>
+        </div>
+    `).join('');
+}
+
+// Show error message
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    document.body.appendChild(errorDiv);
+}
 
 // Load and display country list
 async function loadCountryList() {
@@ -440,33 +719,6 @@ function createGlobalMap() {
     Plotly.newPlot('map', data, layout, {responsive: true});
 }
 
-// Update country list in sidebar
-function updateCountryList() {
-    const countries = getTopCountries();
-    const countryList = document.getElementById('country-list');
-    
-    if (countryList) {
-        countryList.innerHTML = countries
-            .map(country => {
-                const escapismScore = calculateEscapismScore(country);
-                const realityScore = calculateRealityScore(country);
-                const contentCount = getCountryContentCount(country);
-                
-                return `
-                    <div class="country-item">
-                        <span class="country-name">${country}</span>
-                        <div class="score-indicators">
-                            <span class="score escapism" title="Escapism Score">${escapismScore.toFixed(2)}</span>
-                            <span class="score reality" title="Reality Score">${realityScore.toFixed(2)}</span>
-                            <span class="count" title="Total Content">${contentCount}</span>
-                        </div>
-                    </div>
-                `;
-            })
-            .join('');
-    }
-}
-
 // Helper functions
 function getTopCountries(limit = null) {
     const countryCount = {};
@@ -542,13 +794,6 @@ function groupByMonth(data) {
         monthly[monthKey].count++;
     });
     return monthly;
-}
-
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    document.body.appendChild(errorDiv);
 }
 
 // Helper functions for data processing

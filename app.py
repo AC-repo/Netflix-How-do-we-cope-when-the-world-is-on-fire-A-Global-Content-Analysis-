@@ -1,10 +1,12 @@
+# NOTE: Run this Flask app with `python app.py` and access it at http://localhost:5000
+# Do NOT use port 8080 unless you have specifically configured Flask to run there.
 from flask import Flask, render_template, jsonify
 import json
 import pandas as pd
 import sqlite3
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Configuration
 DB_PATH = "netflix_titles.db"
@@ -87,4 +89,4 @@ def get_global_preferences():
     return jsonify(preferences)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True, port=5000) 

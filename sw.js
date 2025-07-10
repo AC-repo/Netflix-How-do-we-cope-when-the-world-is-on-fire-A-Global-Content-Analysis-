@@ -1,52 +1,110 @@
 const CACHE_NAME = 'netflix-analysis-v1';
-const BASE_PATH = '/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/';
-
-const ASSETS_TO_CACHE = [
-    BASE_PATH,
-    `${BASE_PATH}index.html`,
-    `${BASE_PATH}css/style.css`,
-    `${BASE_PATH}js/main.js`,
-    `${BASE_PATH}js/visualizations.js`,
-    `${BASE_PATH}images/icon.svg`,
-    `${BASE_PATH}images/icon-192.png`,
-    `${BASE_PATH}images/icon-512.png`,
-    `${BASE_PATH}manifest.json`,
-    `${BASE_PATH}data/netflix_titles.json`,
-    'https://cdn.plot.ly/plotly-2.27.0.min.js'
+const STATIC_ASSETS = [
+    '/',
+    '/index.html',
+    '/css/style.css',
+    '/js/main.js',
+    '/js/visualizations.js',
+    '/images/icon.svg',
+    '/images/icon-192.png',
+    '/images/icon-512.png',
+    '/manifest.json'
 ];
 
-// Install event - cache assets
+const DATA_CACHE_NAME = 'netflix-data-v1';
+const API_PATHS = [
+    '/api/countries',
+    '/api/covid-analysis',
+    '/api/political-matrix',
+    '/api/global-preferences'
+];
+
+// Install event - cache static assets
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(ASSETS_TO_CACHE))
-            .then(() => self.skipWaiting())
+            .then(cache => {
+                console.log('Caching static assets');
+                return cache.addAll(STATIC_ASSETS);
+            })
+            .catch(error => {
+                console.error('Error caching static assets:', error);
+            })
     );
 });
 
-// Activate event - clean old caches
+// Activate event - clean up old caches
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys()
-            .then(cacheNames => {
-                return Promise.all(
-                    cacheNames
-                        .filter(name => name !== CACHE_NAME)
-                        .map(name => caches.delete(name))
-                );
-            })
-            .then(() => self.clients.claim())
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME) {
+                        console.log('Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
     );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - handle requests
 self.addEventListener('fetch', event => {
-    // Skip cross-origin requests
-    if (!event.request.url.startsWith(self.location.origin) && 
-        !event.request.url.startsWith('https://cdn.plot.ly/')) {
+    const url = new URL(event.request.url);
+    
+    // Handle API requests
+    if (API_PATHS.some(path => url.pathname.startsWith(path))) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    if (!response || response.status !== 200) {
+                        return response;
+                    }
+
+                    // Clone the response
+                    const responseToCache = response.clone();
+
+                    caches.open(DATA_CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request);
+                })
+        );
         return;
     }
 
+    // Handle country-specific API requests
+    if (url.pathname.startsWith('/api/country/')) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    if (!response || response.status !== 200) {
+                        return response;
+                    }
+
+                    const responseToCache = response.clone();
+
+                    caches.open(DATA_CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    // Handle static assets
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -55,48 +113,21 @@ self.addEventListener('fetch', event => {
                 }
 
                 return fetch(event.request).then(response => {
-                    // Don't cache non-successful responses
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                    if (!response || response.status !== 200) {
                         return response;
                     }
 
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            cache.put(event.request, responseToCache);
-                        });
+                    // Cache static assets that weren't cached during install
+                    if (event.request.url.match(/\.(css|js|html|svg|png|json)$/)) {
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+                    }
 
                     return response;
                 });
             })
     );
-});
-
-// Handle API Requests
-self.addEventListener('fetch', event => {
-    if (event.request.url.includes('/api/')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    return response;
-                })
-                .catch(() => {
-                    // Return cached data if available, otherwise show offline message
-                    return caches.match(event.request)
-                        .then(response => {
-                            if (response) {
-                                return response;
-                            }
-                            return new Response(
-                                JSON.stringify({
-                                    error: 'You are offline and no cached data is available.'
-                                }),
-                                {
-                                    headers: { 'Content-Type': 'application/json' }
-                                }
-                            );
-                        });
-                })
-        );
-    }
 }); 

@@ -11,17 +11,15 @@
     
     <title>Netflix Content Analysis</title>
     
-    <base href="/Netflix-How-do-we-cope-when-the-world-is-on-fire-A-Global-Content-Analysis-/">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="images/icon.svg">
-    <link rel="apple-touch-icon" href="images/icon-192.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/svg+xml" href="/images/icon.svg">
+    <link rel="apple-touch-icon" href="/images/icon-192.png">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="manifest" href="/manifest.json">
     
     <!-- Load Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <!-- Load our application code -->
-    <script type="module" src="js/visualizations.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="/js/main.js"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -35,16 +33,6 @@
             <div class="nav-section">
                 <h3>Countries</h3>
                 <div id="country-list" role="list" aria-label="Country list"></div>
-            </div>
-            
-            <div class="nav-section">
-                <h3>Global Views</h3>
-                <ul role="list" aria-label="Global views">
-                    <li><a href="#global-heatmap">Global Heatmap</a></li>
-                    <li><a href="#preference-comparison">Preference Comparison</a></li>
-                    <li><a href="#covid-content-stats">COVID-19 Impact</a></li>
-                    <li><a href="#political-matrix">Political Context</a></li>
-                </ul>
             </div>
         </div>
     </nav>
@@ -75,35 +63,40 @@
                 <h2>Global Content Distribution</h2>
                 <div class="chart-container"></div>
             </div>
-
-            <div id="preference-comparison" class="visualization">
-                <h2>Content Preferences by Country</h2>
-                <div class="chart-container"></div>
-            </div>
-
-            <div id="covid-content-stats" class="visualization">
-                <h2>COVID-19 Impact Analysis</h2>
-                <div class="chart-container"></div>
-            </div>
-
-            <div id="political-matrix" class="visualization">
-                <h2>Political Context Analysis</h2>
-                <div class="chart-container"></div>
-            </div>
         </section>
     </main>
 
     <script>
-        // Register Service Worker for PWA
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js', {
+                        scope: '/'
                     });
+                    console.log('ServiceWorker registration successful:', registration);
+                    
+                    // Handle updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('Service Worker update found!');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('New content is available; please refresh.');
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('ServiceWorker registration failed:', error);
+                }
+            });
+
+            // Handle communication with SW
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data.type === 'CACHE_UPDATED') {
+                    console.log('New content is available; please refresh.');
+                }
             });
         }
     </script>

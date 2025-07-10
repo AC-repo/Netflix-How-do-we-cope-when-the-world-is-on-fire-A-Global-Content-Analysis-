@@ -11,13 +11,19 @@
     
     <title>Netflix Content Analysis</title>
     
-    <link rel="manifest" href="/static/manifest.json">
-    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Use Flask's url_for for all static assets -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/icon.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="/static/js/main.js" defer></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 <body>
+    <!--
+    NOTE: For local development, run the Flask app with `python app.py` and access the dashboard at http://localhost:5000
+    Do NOT use port 8080 unless you have specifically configured Flask to run there.
+    -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
     <nav class="sidebar" role="navigation" aria-label="Main navigation">

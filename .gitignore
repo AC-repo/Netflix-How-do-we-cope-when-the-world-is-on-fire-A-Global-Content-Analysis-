@@ -45,3 +45,9 @@ Thumbs.db
 *.sqlite3
 *.db
 *.db-journal 
+
+# Ignore Mac system files
+.DS_Store
+
+# Ignore irrelevant old stuff folder
+irrelevant_old_stuff/ 
